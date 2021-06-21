@@ -1,0 +1,17 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    excon (0.82.0)
+    terminal-table (3.0.1)
+      unicode-display_width (>= 1.1.1, < 3)
+    unicode-display_width (2.0.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  excon
+  terminal-table
+
+BUNDLED WITH
+   2.1.4

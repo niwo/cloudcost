@@ -1,0 +1,21 @@
+---
+# server pricing per day in CHF
+servers:
+  flex-2: 1
+  flex-4: 1.5
+  flex-8: 3
+  flex-16: 6
+  flex-32: 12
+  flex-48: 18
+  flex-64: 24
+  flex-96: 36
+  plus-8: 4
+  plus-12: 6
+  plus-16: 8
+  plus-24: 12
+
+# storage pricing per day and GB in CHF
+storage:
+  ssd: 0.01
+  bulk: 0.0025
+  object: 0.003
