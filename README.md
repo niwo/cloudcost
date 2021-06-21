@@ -4,7 +4,7 @@ This handy tool helps you fetching servers from the cloudscale.ch API and calcul
 
 ## Usage
 
-Make sure you have exported you API_TOKEN in your environment:
+Make sure you have exported your API_TOKEN in your environment:
 
 ```sh
 export CLOUDSCALE_API_TOKEN=HELPIMTRAPPEDINATOKENGENERATOR
