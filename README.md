@@ -19,5 +19,5 @@ bundle install
 Run it:
 
 ```sh
-bundle exec cloudscale_cost_explorer.rb
+bundle exec bin/cloudscale_cost_explorer
 ```
