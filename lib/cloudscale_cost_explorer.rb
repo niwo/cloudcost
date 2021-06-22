@@ -1,53 +1,36 @@
+require 'thor'
 require 'terminal-table'
 require 'tty-spinner'
+require 'cloudscale_cost_explorer/version'
 require 'cloudscale_cost_explorer/server'
 
 module CloudscaleCostExplorer
 
-  def self.print_servers(servers, filters = {})
-    if filters.has_key?(:name)
-      servers = servers.select { |server| filters[:name].match? server[:name] }
+  class CLI < Thor
+    # Error raised by this runner
+    Error = Class.new(StandardError)
+
+    desc 'version', 'app version'
+    def version
+      puts "v#{CloudscaleCostExplorer::VERSION}"
     end
-    table = Terminal::Table.new do |t|
-      t.title = "cloudscale.ch Costs"
-      t.headings = ['Name', 'Flavor', 'SSD', 'Bulk', 'CHF per Day', 'CHF per Month']
-    end
-    grand_total = 0
-    servers.sort_by{|server| server[:name]}.each do |server_data| 
-      server = Server.new(server_data)
-      grand_total += server.total_costs_per_day
-      table.add_row [
-        server.name,
-        server.flavor,
-        server.storage_size(:ssd) > 0 ? "#{server.storage_size(:ssd)} GB" : "-",
-        server.storage_size(:bulk) > 0 ? "#{server.storage_size(:bulk)} GB" : "-",
-        sprintf("%.2f", server.total_costs_per_day.round(2)),
-        "#{(server.total_costs_per_day * 30).round}.-"
-      ]
+    map %w(--version -v) => :version
+
+    desc "servers", "explore servers"
+    option :name_filter, desc: "filter name by regex"
+    option :tag_filter, desc: "filter servers by tag"
+    def servers
+      spinner =  TTY::Spinner.new("[:spinner] Loading servers...")
+      spinner.auto_spin
+      begin
+        servers = CloudscaleCostExplorer.load_servers(options['tag_filter'])
+        spinner.success "(loaded #{servers.size} servers)"
+        CloudscaleCostExplorer.print_servers(servers, options)
+      rescue StandardError => e
+        spinner.error("(#{e.message})")
+      end
     end
 
-    table.add_separator
-    table.add_row [
-      'Total', '', '', '',
-      "#{grand_total.round}.-",
-      "#{(grand_total * 30).round.to_s.reverse.scan(/.{1,3}/).join("'").reverse}.-"
-    ]
-    (2..5).each {|column| table.align_column(column, :right) }
-    puts table
-  end
-
-  def self.run
-    spinner =  TTY::Spinner.new("[:spinner] Loading servers...")
-    spinner.auto_spin
-    begin
-      servers = CloudscaleCostExplorer.load_servers
-      spinner.success "(loaded #{servers.size} servers)"
-      # You can filter names by regex, cool!
-      # print_servers(servers, name: /ocp4.*/)
-      print_servers(servers)
-    rescue StandardError => e
-      spinner.error("(#{e.message})")
-    end
   end
 
 end

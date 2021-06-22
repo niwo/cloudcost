@@ -2,4 +2,4 @@
 
 require 'cloudscale_cost_explorer'
 
-CloudscaleCostExplorer.run
+CloudscaleCostExplorer::CLI.start(ARGV)
