@@ -1,17 +1,27 @@
+PATH
+  remote: .
+  specs:
+    cloudscale_cost_explorer (0.0.1)
+      excon
+      terminal-table
+      tty-spinner
+
 GEM
   remote: https://rubygems.org/
   specs:
     excon (0.82.0)
     terminal-table (3.0.1)
       unicode-display_width (>= 1.1.1, < 3)
+    tty-cursor (0.7.1)
+    tty-spinner (0.9.3)
+      tty-cursor (~> 0.7)
     unicode-display_width (2.0.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  excon
-  terminal-table
+  cloudscale_cost_explorer!
 
 BUNDLED WITH
    2.1.4
