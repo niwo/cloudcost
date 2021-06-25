@@ -7,6 +7,9 @@ module CloudscaleCostExplorer
   AUTH_HEADER = { "Authorization" => "Bearer #{API_TOKEN}" }
 
   def self.load_servers(tag)
+    unless API_TOKEN
+      raise "no CLOUDSCALE_API_TOKEN found in your environment"
+    end
     connection = Excon.new(
       'https://api.cloudscale.ch',
       headers: AUTH_HEADER
