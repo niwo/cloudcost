@@ -27,7 +27,7 @@ module CloudscaleCostExplorer
         spinner.success "(loaded #{servers.size} servers)"
         CloudscaleCostExplorer.print_servers(servers, options)
       rescue StandardError => e
-        spinner.error("(#{e.message})")
+        spinner.error("(ERROR: #{e.message})")
       end
     end
 
