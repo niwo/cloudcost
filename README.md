@@ -25,7 +25,7 @@ Otherwise you can export a `CLOUDSCALE_API_TOKEN` in your environment:
 export CLOUDSCALE_API_TOKEN=HELPIMTRAPPEDINATOKENGENERATOR
 ```
 
-**NOTE:** You only need read access to the API.
+**NOTE:** The API_TOKEN does only require read access.
 
 
 ## Usage
