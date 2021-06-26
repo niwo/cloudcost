@@ -1,16 +1,10 @@
 # cloudscale.ch Cost Explorer
 
-A CLI tool which helps you fetching servers from the cloudscale.ch API and exploring costs.
+A CLI-tool which helps you exploring costs on [cloudscale.ch](https://www.cloudscale.ch).
+
+Resources are fetched from the [API](https://www.cloudscale.ch/en/api/v1) and costs calculated using prices defined in `data/pricing.yml`.
 
 ## Setup
-
-Make sure you have exported your API_TOKEN in your environment:
-
-```sh
-export CLOUDSCALE_API_TOKEN=HELPIMTRAPPEDINATOKENGENERATOR
-```
-
-NOTE: You only need read access to the API.
 
 Ruby is required, install dependencies using bundler:
 
@@ -18,9 +12,25 @@ Ruby is required, install dependencies using bundler:
 bundle install
 ```
 
+## Configure API-Auth
+
+cloudscale_cost_explorer does support the same auth configuration options as [cloudscale-cli](https://cloudscale-ch.github.io/cloudscale-cli/).
+
+You can manage multiple profiles using `cloudscale.ini` files ([see here](https://cloudscale-ch.github.io/cloudscale-cli/auth/) for instructions). 
+
+
+Otherwise you can export a `CLOUDSCALE_API_TOKEN` in your environment:
+
+```sh
+export CLOUDSCALE_API_TOKEN=HELPIMTRAPPEDINATOKENGENERATOR
+```
+
+**NOTE:** The API_TOKEN does only require read access.
+
+
 ## Usage
 
-Diplay help:
+Display help:
 
 ```sh
 bundle exec bin/cloudscale_cost_explorer
@@ -36,14 +46,14 @@ Filter by servers by regex on name:
 
 ```sh
 # only show servers which names start with 'k8s'
-bundle exec bin/cloudscale_cost_explorer servers --name-filter "^k8s.*"
+bundle exec bin/cloudscale_cost_explorer servers --name "^k8s.*"
 
 # exclude different name patterns
-bundle exec bin/cloudscale_cost_explorer servers --name-filter "^[^ocp|^k8s|^rancher|^ocp|^lightning].*"
+bundle exec bin/cloudscale_cost_explorer servers --name "^[^ocp|^k8s|^rancher|^ocp|^lightning].*"
 ```
 
 Filter servers by tag:
 
 ```sh
-bundle exec bin/cloudscale_cost_explorer servers --tag-filter "pitc_service=ocp4"
+bundle exec bin/cloudscale_cost_explorer servers --tag "pitc_service=ocp4"
 ```

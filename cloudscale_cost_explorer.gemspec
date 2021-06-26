@@ -22,4 +22,5 @@ Gem::Specification.new do |s|
   s.add_dependency('excon', '~> 0.82.0')
   s.add_dependency('tty-spinner', '~> 0.9.3')
   s.add_dependency('terminal-table', '~> 3.0.1')
+  s.add_dependency('parseconfig', '~> 1.1.0')
 end
