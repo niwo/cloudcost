@@ -2,7 +2,7 @@
 
 A CLI-tool which helps you exploring costs on [cloudscale.ch](https://www.cloudscale.ch).
 
-Resources are fetched from the [API](https://www.cloudscale.ch/en/api/v1) and costs calculated using prices configured under ´data/pricing.yml´.
+Resources are fetched from the [API](https://www.cloudscale.ch/en/api/v1) and costs calculated using prices configured under `data/pricing.yml`.
 
 ## Setup
 
@@ -16,7 +16,7 @@ bundle install
 
 cloudscale_cost_explorer does support the same auth configuration options as [cloudscale-cli](https://cloudscale-ch.github.io/cloudscale-cli/).
 
-You can manage multiple profiles using `cloudscale.ini` files ([read more]([cloudscale-cli](https://cloudscale-ch.github.io/cloudscale-cli/auth/))). 
+You can manage multiple profiles using `cloudscale.ini` files ([read more]([cloudscale-cli](https://cloudscale-ch.github.io/cloudscale-cli/auth/)). 
 
 
 Otherwise you can export a `CLOUDSCALE_API_TOKEN` in your environment:
