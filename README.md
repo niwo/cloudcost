@@ -12,7 +12,7 @@ Ruby is required, install dependencies using bundler:
 bundle install
 ```
 
-## Configure API Key(s)
+## Configure API-Auth
 
 cloudscale_cost_explorer does support the same auth configuration options as [cloudscale-cli](https://cloudscale-ch.github.io/cloudscale-cli/).
 
