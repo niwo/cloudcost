@@ -2,7 +2,7 @@
 
 A CLI-tool which helps you exploring costs on [cloudscale.ch](https://www.cloudscale.ch).
 
-Resources are fetched from the [API](https://www.cloudscale.ch/en/api/v1) and costs calculated using prices configured under `data/pricing.yml`.
+Resources are fetched from the [API](https://www.cloudscale.ch/en/api/v1) and costs calculated using prices defined in `data/pricing.yml`.
 
 ## Setup
 
