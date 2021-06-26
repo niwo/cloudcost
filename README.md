@@ -30,7 +30,7 @@ export CLOUDSCALE_API_TOKEN=HELPIMTRAPPEDINATOKENGENERATOR
 
 ## Usage
 
-Diplay help:
+Display help:
 
 ```sh
 bundle exec bin/cloudscale_cost_explorer
