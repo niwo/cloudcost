@@ -34,16 +34,32 @@ or you can directly pass a token as a argument to the command: `--api-token HELP
 
 ## Usage
 
+### Help
+
 Display help:
 
 ```sh
-bundle exec bin/cloudscale_cost_explorer
+bundle exec bin/cloudscale_cost_explorer help
 ```
+
+Describe the server command:
+
+```sh
+bundle exec bin/cloudscale_cost_explorer help server
+```
+
+### Servers
 
 List all servers from the given environment:
 
 ```sh
 bundle exec bin/cloudscale_cost_explorer servers
+```
+
+Only show summarized usage:
+
+```sh
+bundle exec bin/cloudscale_cost_explorer servers --summary
 ```
 
 Filter by servers by regex on name:
