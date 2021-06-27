@@ -1,8 +1,11 @@
 # cloudscale.ch Cost Explorer
 
-A CLI-tool which helps you exploring costs on [cloudscale.ch](https://www.cloudscale.ch).
+A CLI-tool which helps you explore costs on [cloudscale.ch](https://www.cloudscale.ch).
 
 Resources are fetched from the [API](https://www.cloudscale.ch/en/api/v1) and costs calculated using prices defined in `data/pricing.yml`.
+
+Please note that costs are always calculated based on the current usage.
+Your actual bills are based on the effective usage over time and may include additional service fees, i.e. for data transfer or discounts.  
 
 ## Setup
 
@@ -25,8 +28,9 @@ Otherwise you can export a `CLOUDSCALE_API_TOKEN` in your environment:
 export CLOUDSCALE_API_TOKEN=HELPIMTRAPPEDINATOKENGENERATOR
 ```
 
-**NOTE:** The API_TOKEN does only require read access.
+or you can directly pass a token as a argument to the command: `--api-token HELPIMTRAPPEDINATOKENGENERATOR`
 
+**NOTE:** The API_TOKEN does only require read access.
 
 ## Usage
 
