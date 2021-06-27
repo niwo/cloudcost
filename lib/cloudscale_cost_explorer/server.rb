@@ -1,47 +1,6 @@
 require "cloudscale_cost_explorer/pricing"
-require 'excon'
-require 'json'
 
 module CloudscaleCostExplorer
-  API_TOKEN = ENV["CLOUDSCALE_API_TOKEN"]
-  AUTH_HEADER = { "Authorization" => "Bearer #{API_TOKEN}" }
-
-  def self.get_servers(connection, options = {})
-    connection.get_resource("servers", options)
-  end
-
-  def self.print_servers(servers, options = {})
-    if options[:name]
-      servers = servers.select { |server| /#{options[:name]}/.match? server[:name] }
-    end
-    table = Terminal::Table.new do |t|
-      t.title = "cloudscale.ch costs"
-      t.title += " (#{options[:profile]})"
-      t.headings = ['Name', 'Flavor', 'SSD', 'Bulk', 'CHF per Day', 'CHF per Month']
-    end
-    grand_total = 0
-    servers.sort_by{|server| server[:name]}.each do |server_data| 
-      server = Server.new(server_data)
-      grand_total += server.total_costs_per_day
-      table.add_row [
-        server.name,
-        server.flavor,
-        server.storage_size(:ssd) > 0 ? "#{server.storage_size(:ssd)} GB" : "-",
-        server.storage_size(:bulk) > 0 ? "#{server.storage_size(:bulk)} GB" : "-",
-        sprintf("%.2f", server.total_costs_per_day.round(2)),
-        "#{(server.total_costs_per_day * 30).round}.-"
-      ]
-    end
-
-    table.add_separator
-    table.add_row [
-      'Total', '', '', '',
-      "#{grand_total.round}.-",
-      "#{(grand_total * 30).round.to_s.reverse.scan(/.{1,3}/).join("'").reverse}.-"
-    ]
-    (2..5).each {|column| table.align_column(column, :right) }
-    puts table
-  end
 
   class Server
     def initialize(data)
@@ -55,6 +14,14 @@ module CloudscaleCostExplorer
 
     def flavor
       @data[:flavor][:slug]
+    end
+
+    def vcpu_count
+      @data[:flavor][:vcpu_count]
+    end
+
+    def memory_gb
+      @data[:flavor][:memory_gb]
     end
 
     def storage_size(type = :ssd)
@@ -83,4 +50,5 @@ module CloudscaleCostExplorer
     end
 
   end
+
 end
