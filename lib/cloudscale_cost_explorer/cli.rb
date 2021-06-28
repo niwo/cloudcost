@@ -29,7 +29,7 @@ module CloudscaleCostExplorer
     option :name, desc: "filter name by regex", aliases: %w(-n)
     option :tag, desc: "filter servers by tag", aliases: %w(-t)
     option :summary, desc: "display totals only", type: :boolean, aliases: %w(-S)
-    option :csv, desc: "output in csv format", type: :boolean
+    option :output, default: "table", enum: %w(table csv), desc: "output format"
     def servers
       spinner =  TTY::Spinner.new("[:spinner] Loading servers...")
       begin
@@ -38,7 +38,7 @@ module CloudscaleCostExplorer
         spinner.auto_spin unless options[:csv]
         servers = api.get_servers(options).map { |server| Server.new(server) }
         
-        if options[:csv]
+        if options[:output] == "csv"
           puts CloudscaleCostExplorer::ServerList.new(servers, options).to_csv
         else
           spinner.success "(loaded #{servers.size} servers)"

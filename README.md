@@ -65,7 +65,7 @@ bundle exec bin/cloudscale_cost_explorer servers --summary
 Output in CSV format instead of a table: 
 
 ```sh
-bundle exec bin/cloudscale_cost_explorer servers --csv
+bundle exec bin/cloudscale_cost_explorer servers --output csv
 ```
 
 Filter by servers by regex on name:
