@@ -20,44 +20,67 @@ module CloudscaleCostExplorer
       totals
     end
 
-    def table
-      table = Terminal::Table.new do |t|
-        t.title = "cloudscale.ch costs"
-        t.title += " (#{@options[:profile]})" if @options[:profile]
-        headings = @options[:summary] ? [""] : ["Name", "Flavor"] 
-        headings.concat ["vCPU's", "Memory", "SSD", "Bulk", "CHF per day", "CHF per month"]
-        t.headings = headings
-      end
-  
+    def headings
+      headings = @options[:summary] ? [""] : ["Name", "UUID", "Flavor"] 
+      headings.concat ["vCPU's", "Memory [GB]", "SSD [GB]", "Bulk [GB]", "CHF/day", "CHF/30-days"]
+    end
+
+    def rows
+      rows = []
       unless @options[:summary]
-        @servers.sort_by{ |s| s.name }.each do |server|
-            table.add_row [
+        @servers.sort_by{ |s| s.name }.map do |server|
+            rows << [
               server.name,
+              server.uuid,
               server.flavor,
               server.vcpu_count,
               server.memory_gb,
-              server.storage_size(:ssd) > 0 ? "#{server.storage_size(:ssd)} GB" : "-",
-              server.storage_size(:bulk) > 0 ? "#{server.storage_size(:bulk)} GB" : "-",
+              server.storage_size(:ssd),
+              server.storage_size(:bulk),
               sprintf("%.2f", server.total_costs_per_day.round(2)),
-              "#{(server.total_costs_per_day * 30).round}.-"
+              sprintf("%.2f", (server.total_costs_per_day * 30).round(2))
             ]
         end
       end
-  
-      table.add_separator unless @options[:summary]
-      total_row = @options[:summary] ? %w(Total) : ["Total", ""]
+      rows
+    end
+
+    def totals
+      total_row = @options[:summary] ? %w(Total) : ["Total", "", ""]
       total_row.concat [
         @totals[:vcpu], 
-        "#{@totals[:memory]} GB",
-        "#{@totals[:ssd]} GB",
-        "#{@totals[:bulk]} GB",
-        "#{@totals[:cost].round}.-",
-        "#{(@totals[:cost] * 30).round.to_s.reverse.scan(/.{1,3}/).join("'").reverse}.-"
-      ]  
-      table.add_row total_row
+        @totals[:memory],
+        @totals[:ssd],
+        @totals[:bulk],
+        sprintf("%.2f", @totals[:cost].round(2)),
+        sprintf("%.2f", (@totals[:cost] * 30).round(2))
+      ]
+    end
+
+    def to_table
+      table = Terminal::Table.new do |t|
+        t.title = "cloudscale.ch costs"
+        t.title += " (#{@options[:profile]})" if @options[:profile]
+        t.headings = headings
+        t.rows = rows unless @options[:summary]
+      end
+  
+      table.add_separator unless @options[:summary]
+      table.add_row totals
       first_number_row = @options[:summary] ? 1 : 2
       (first_number_row..table.columns.size).each {|column| table.align_column(column, :right) }
       table
+    end
+
+    def to_csv
+      CSV.generate do |csv|
+        csv << headings
+        if @options[:summary]
+          csv << totals
+        else
+          rows.each { |row| csv << row }
+        end
+      end
     end
 
   end

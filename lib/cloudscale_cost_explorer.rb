@@ -1,3 +1,6 @@
+require "terminal-table"
+require "csv"
+
 require "cloudscale_cost_explorer/version"
 require "cloudscale_cost_explorer/api_token"
 require "cloudscale_cost_explorer/api_connection"

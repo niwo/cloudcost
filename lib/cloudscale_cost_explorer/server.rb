@@ -12,6 +12,10 @@ module CloudscaleCostExplorer
       @data[:name]
     end
 
+    def uuid
+      @data[:uuid]
+    end
+
     def flavor
       @data[:flavor][:slug]
     end
