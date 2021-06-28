@@ -1,5 +1,4 @@
 require "thor"
-require "terminal-table"
 require "tty-spinner"
 
 module CloudscaleCostExplorer
@@ -30,15 +29,21 @@ module CloudscaleCostExplorer
     option :name, desc: "filter name by regex", aliases: %w(-n)
     option :tag, desc: "filter servers by tag", aliases: %w(-t)
     option :summary, desc: "display totals only", type: :boolean, aliases: %w(-S)
+    option :csv, desc: "output in csv format", type: :boolean
     def servers
       spinner =  TTY::Spinner.new("[:spinner] Loading servers...")
       begin
         api_token = options[:api_token] || CloudscaleCostExplorer::ApiToken.new(options).token
         api = CloudscaleCostExplorer::ApiConnection.new(api_token, options)
-        spinner.auto_spin
+        spinner.auto_spin unless options[:csv]
         servers = api.get_servers(options).map { |server| Server.new(server) }
-        spinner.success "(loaded #{servers.size} servers)"
-        puts CloudscaleCostExplorer::ServerList.new(servers, options).table
+        
+        if options[:csv]
+          puts CloudscaleCostExplorer::ServerList.new(servers, options).to_csv
+        else
+          spinner.success "(loaded #{servers.size} servers)"
+          puts CloudscaleCostExplorer::ServerList.new(servers, options).to_table
+        end
       rescue Excon::Error, TokenError, ProfileError => e
         spinner.error("(ERROR: #{e.message})")
       end

@@ -62,6 +62,12 @@ Only show summarized usage:
 bundle exec bin/cloudscale_cost_explorer servers --summary
 ```
 
+Output in CSV format instead of a table: 
+
+```sh
+bundle exec bin/cloudscale_cost_explorer servers --csv
+```
+
 Filter by servers by regex on name:
 
 ```sh
