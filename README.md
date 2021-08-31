@@ -100,9 +100,9 @@ Filter servers by tag value:
 cloudscale_cost_explorer servers --tag pitc_service=ocp4
 ```
 
-## Server Tags
+### Server Tags
 
-### Show tags
+#### Show tags
 
 Display a list of servers and show theire tags:
 
@@ -112,13 +112,13 @@ cloudscale_cost_explorer server-tags
 
 Note thats the same filter options as with the `servers` command apply.
 
-### Set tags
+#### Set tags
 
 ```sh
 cloudscale_cost_explorer server-tags --name ldap --set-tags owner=sys budget-group=base-infrastructure
 ```
 
-### Remove tags
+#### Remove tags
 
 ```sh
 cloudscale_cost_explorer server-tags --name ldap --remove-tags owner budget-group
