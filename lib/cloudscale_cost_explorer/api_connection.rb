@@ -28,6 +28,15 @@ module CloudscaleCostExplorer
       servers
     end
 
+    def set_server_tags(uuid, tags)
+      @connection.patch(
+        path: "v1/servers/#{uuid}",
+        body: { tags: tags }.to_json,
+        headers: { "Content-Type": "application/json" },
+        expects: [204]
+      )
+    end
+
     private
 
     def new_connection

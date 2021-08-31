@@ -13,6 +13,14 @@ servers:
   plus-12: 6
   plus-16: 8
   plus-24: 12
+  plus-32: 16
+  plus-48: 24
+  plus-64: 32
+  plus-96: 48
+  plus-128: 64
+  plus-160: 80
+  plus-192: 96
+  plus-224: 112
 
 # storage pricing per day and GB in CHF
 storage:

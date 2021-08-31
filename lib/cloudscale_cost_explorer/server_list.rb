@@ -5,7 +5,6 @@ module CloudscaleCostExplorer
     def initialize(servers, options = {})
       @servers = servers
       @options = options
-      @totals = calculate_totals()
     end
 
     def calculate_totals
@@ -21,7 +20,7 @@ module CloudscaleCostExplorer
     end
 
     def headings
-      headings = @options[:summary] ? [""] : ["Name", "UUID", "Flavor"] 
+      headings = @options[:summary] ? [""] : %w(Name UUID Flavor Tags) 
       headings.concat ["vCPU's", "Memory [GB]", "SSD [GB]", "Bulk [GB]", "CHF/day", "CHF/30-days"]
     end
 
@@ -33,6 +32,7 @@ module CloudscaleCostExplorer
               server.name,
               server.uuid,
               server.flavor,
+              server.tags_to_s,
               server.vcpu_count,
               server.memory_gb,
               server.storage_size(:ssd),
@@ -46,20 +46,36 @@ module CloudscaleCostExplorer
     end
 
     def totals
-      total_row = @options[:summary] ? %w(Total) : ["Total", "", ""]
+      totals = calculate_totals
+      total_row = @options[:summary] ? %w(Total) : ["Total", "", "", ""]
       total_row.concat [
-        @totals[:vcpu], 
-        @totals[:memory],
-        @totals[:ssd],
-        @totals[:bulk],
-        sprintf("%.2f", @totals[:cost].round(2)),
-        sprintf("%.2f", (@totals[:cost] * 30).round(2))
+        totals[:vcpu], 
+        totals[:memory],
+        totals[:ssd],
+        totals[:bulk],
+        sprintf("%.2f", totals[:cost].round(2)),
+        sprintf("%.2f", (totals[:cost] * 30).round(2))
       ]
     end
 
-    def to_table
+    def tags_table
+      Terminal::Table.new do |t|
+        t.title = "cloudscale.ch server tags"
+        t.title += " (#{@options[:profile]})" if @options[:profile]
+        t.headings = %w(Name UUID Tags)
+        t.rows = @servers.sort_by{ |s| s.name }.map do |server|
+          [
+            server.name,
+            server.uuid,
+            server.tags_to_s
+          ]
+        end
+      end
+    end
+
+    def cost_table
       table = Terminal::Table.new do |t|
-        t.title = "cloudscale.ch costs"
+        t.title = "cloudscale.ch server costs"
         t.title += " (#{@options[:profile]})" if @options[:profile]
         t.headings = headings
         t.rows = rows unless @options[:summary]
