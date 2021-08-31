@@ -39,47 +39,87 @@ or you can directly pass a token as a argument to the command: `--api-token HELP
 Display help:
 
 ```sh
-bundle exec bin/cloudscale_cost_explorer help
+cloudscale_cost_explorer help
 ```
 
 Describe the server command:
 
 ```sh
-bundle exec bin/cloudscale_cost_explorer help server
+cloudscale_cost_explorer help server
 ```
 
 ### Servers
 
+#### Detailed List
+
 List all servers from the given environment:
 
 ```sh
-bundle exec bin/cloudscale_cost_explorer servers
+cloudscale_cost_explorer servers
 ```
+
+#### Summary
 
 Only show summarized usage:
 
 ```sh
-bundle exec bin/cloudscale_cost_explorer servers --summary
+cloudscale_cost_explorer servers --summary
 ```
 
-Output in CSV format instead of a table: 
+#### Output CSV
+
+Output in CSV format instead of a table:
 
 ```sh
-bundle exec bin/cloudscale_cost_explorer servers --output csv
+cloudscale_cost_explorer servers --output csv
 ```
+
+#### Filter by name
 
 Filter by servers by regex on name:
 
 ```sh
-# only show servers which names start with 'k8s'
-bundle exec bin/cloudscale_cost_explorer servers --name "^k8s.*"
+# only show servers which names include a k8s or rancher:
+cloudscale_cost_explorer servers --name "k8s|rancher"
 
 # exclude different name patterns
-bundle exec bin/cloudscale_cost_explorer servers --name "^[^ocp|^k8s|^rancher|^ocp|^lightning].*"
+cloudscale_cost_explorer servers --name "^[^ocp|^k8s|^rancher].*"
 ```
 
-Filter servers by tag:
+#### Filter by tag
+
+Filter servers by tag key:
 
 ```sh
-bundle exec bin/cloudscale_cost_explorer servers --tag "pitc_service=ocp4"
+cloudscale_cost_explorer servers --tag pitc_service
+```
+
+Filter servers by tag value:
+
+```sh
+cloudscale_cost_explorer servers --tag pitc_service=ocp4
+```
+
+## Server Tags
+
+### Show tags
+
+Display a list of servers and show theire tags:
+
+```sh
+cloudscale_cost_explorer server-tags
+```
+
+Note thats the same filter options as with the `servers` command apply.
+
+### Set tags
+
+```sh
+cloudscale_cost_explorer server-tags --name ldap --set-tags owner=sys budget-group=base-infrastructure
+```
+
+### Remove tags
+
+```sh
+cloudscale_cost_explorer server-tags --name ldap --remove-tags owner budget-group
 ```
