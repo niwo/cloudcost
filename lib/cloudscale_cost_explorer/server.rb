@@ -2,6 +2,10 @@ require "cloudscale_cost_explorer/pricing"
 
 module CloudscaleCostExplorer
 
+  def self.tags_to_s(tag_hash = [])
+    tag_hash.map {|k,v| "#{k}=#{v}" }.join(" ")
+  end
+
   class Server
     def initialize(data)
       @data = data
@@ -28,6 +32,14 @@ module CloudscaleCostExplorer
       @data[:flavor][:memory_gb]
     end
 
+    def tags
+      @data[:tags]
+    end
+
+    def tags_to_s
+      CloudscaleCostExplorer::tags_to_s(tags)
+    end
+
     def storage_size(type = :ssd)
       @total_storage_per_type[type] || 0
     end
@@ -37,7 +49,7 @@ module CloudscaleCostExplorer
     end
 
     def storage_costs_per_day(type = :ssd)
-      Pricing.storage_costs_per_day(type.to_s, @total_storage_per_type[type] || 0)
+      Pricing.storage_costs_per_day(type.to_s, storage_size(type))
     end
 
     def total_costs_per_day
