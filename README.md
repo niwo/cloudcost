@@ -112,6 +112,16 @@ cloudscale_cost_explorer server-tags
 
 Note thats the same filter options as with the `servers` command apply.
 
+#### Show servers with missing tag
+
+Only show servers which do NOT have a tag-key named "budget-group":
+
+```sh
+cloudscale_cost_explorer server-tags --missing-tag budget-group
+```
+
+Note that this option can also be combined with `set-tags` or any other option.
+
 #### Set tags
 
 ```sh

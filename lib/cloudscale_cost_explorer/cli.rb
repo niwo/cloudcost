@@ -59,6 +59,9 @@ module CloudscaleCostExplorer
             desc: "remove tags",
             aliases: %w(-D),
             type: :array
+    option :missing_tag,
+            desc: "show severs with missing tags",
+            aliases: %w(-M)
     def server_tags
       servers = load_servers(options)
       servers.size > 0 ? puts(CloudscaleCostExplorer::ServerList.new(servers, options).tags_table) : exit
