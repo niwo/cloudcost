@@ -22,6 +22,9 @@ module CloudscaleCostExplorer
 
     def get_servers(options = {})
       servers = get_resource("servers", options)
+      if options[:missing_tag]
+        servers = servers.select { |server| !server[:tags].key?(options[:missing_tag].to_sym) }
+      end
       if options[:name]
         servers = servers.select { |server| /#{options[:name]}/.match? server[:name] }
       end
