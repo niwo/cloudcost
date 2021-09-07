@@ -7,12 +7,12 @@ Resources are fetched from the [API](https://www.cloudscale.ch/en/api/v1) and co
 Please note that costs are always calculated based on the current usage.
 Your actual bills are based on the effective usage over time and may include additional service fees, i.e. for data transfer or discounts.  
 
-## Setup
+## Installation
 
-Ruby is required, install dependencies using bundler:
+Install the gem:
 
 ```sh
-bundle install
+gem install cloudcost
 ```
 
 ## Configure API-Auth
