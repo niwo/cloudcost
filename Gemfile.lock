@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    cloudscale_cost_explorer (0.0.1)
+    cloudcost (0.0.1)
       excon (~> 0.82.0)
       parseconfig (~> 1.1.0)
       terminal-table (~> 3.0.1)
@@ -25,7 +25,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  cloudscale_cost_explorer!
+  cloudcost!
 
 BUNDLED WITH
    2.1.4

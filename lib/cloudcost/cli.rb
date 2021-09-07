@@ -3,7 +3,7 @@
 require "thor"
 require "tty-spinner"
 
-module CloudscaleCostExplorer
+module Cloudcost
   class CLI < Thor
     # Error raised by this runner
     Error = Class.new(StandardError)
@@ -22,7 +22,7 @@ module CloudscaleCostExplorer
 
     desc "version", "app version"
     def version
-      puts "cloudscale_cost_explorer v#{CloudscaleCostExplorer::VERSION}"
+      puts "cloudcost v#{Cloudcost::VERSION}"
     end
     map %w[--version -v] => :version
 
@@ -65,7 +65,7 @@ module CloudscaleCostExplorer
            aliases: %w[-M]
     def server_tags
       servers = load_servers(options)
-      servers.size.positive? ? puts(CloudscaleCostExplorer::ServerList.new(servers, options).tags_table) : exit
+      servers.size.positive? ? puts(Cloudcost::ServerList.new(servers, options).tags_table) : exit
       if (options[:set_tags] || options[:remove_tags]) && ask(
         "Do you want to #{tag_option_to_s(options)}?",
         default: "n"
@@ -103,8 +103,8 @@ module CloudscaleCostExplorer
       end
 
       def api_connection(options)
-        api_token = options[:api_token] || CloudscaleCostExplorer::ApiToken.new(options).token
-        CloudscaleCostExplorer::ApiConnection.new(api_token, options)
+        api_token = options[:api_token] || Cloudcost::ApiToken.new(options).token
+        Cloudcost::ApiConnection.new(api_token, options)
       end
 
       def load_servers(options)
@@ -117,9 +117,9 @@ module CloudscaleCostExplorer
 
       def output(servers, options)
         if options[:output] == "csv"
-          yield CloudscaleCostExplorer::ServerList.new(servers, options).to_csv
+          yield Cloudcost::ServerList.new(servers, options).to_csv
         else
-          yield CloudscaleCostExplorer::ServerList.new(servers, options).cost_table
+          yield Cloudcost::ServerList.new(servers, options).cost_table
         end
       end
 

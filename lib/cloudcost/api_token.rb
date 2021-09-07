@@ -3,9 +3,9 @@
 require "parseconfig"
 require "excon"
 require "json"
-require "cloudscale_cost_explorer/error"
+require "cloudcost/error"
 
-module CloudscaleCostExplorer
+module Cloudcost
   class ApiToken
     attr_accessor :profile, :token
 

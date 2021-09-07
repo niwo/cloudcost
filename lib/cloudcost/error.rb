@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module CloudscaleCostExplorer
+module Cloudcost
   class Error < StandardError; end
 
   class ProfileError < Error; end

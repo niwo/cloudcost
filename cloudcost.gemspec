@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require "English"
-require_relative "lib/cloudscale_cost_explorer/version"
+require_relative "lib/cloudcost/version"
 
 Gem::Specification.new do |s|
-  s.name = "cloudscale_cost_explorer"
-  s.version = CloudscaleCostExplorer::VERSION
-  s.homepage = "https://gitlab.puzzle.ch/nwolfgramm/cloudscale_cost_explorer"
+  s.name = "cloudcost"
+  s.version = Cloudcost::VERSION
+  s.homepage = "https://gitlab.puzzle.ch/nwolfgramm/cloudcost"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nik Wolfgramm"]
@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.required_ruby_version = ">= 2.7"
   s.summary = "cloudscale.ch cost explorer"
-  s.executables = %w[cloudscale_cost_explorer]
+  s.executables = %w[cloudcost]
   s.test_files = s.files.grep(%r{^(test|spec|features)/})
   s.license = "MIT"
 
