@@ -4,7 +4,7 @@ require "yaml"
 
 PRICING = YAML.load_file("data/pricing.yml")
 
-module CloudscaleCostExplorer
+module Cloudcost
   class PricingError < StandardError
   end
 

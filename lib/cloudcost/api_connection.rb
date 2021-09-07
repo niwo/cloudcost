@@ -3,7 +3,7 @@
 require "excon"
 require "json"
 
-module CloudscaleCostExplorer
+module Cloudcost
   class ApiConnection
     API_URL = "https://api.cloudscale.ch"
 

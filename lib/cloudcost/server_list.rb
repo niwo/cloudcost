@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module CloudscaleCostExplorer
+module Cloudcost
   class ServerList
     def initialize(servers, options = {})
       @servers = servers

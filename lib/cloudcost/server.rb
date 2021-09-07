@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "cloudscale_cost_explorer/pricing"
+require "cloudcost/pricing"
 
-module CloudscaleCostExplorer
+module Cloudcost
   def self.tags_to_s(tag_hash = [])
     tag_hash.map { |k, v| "#{k}=#{v}" }.join(" ")
   end
@@ -38,7 +38,7 @@ module CloudscaleCostExplorer
     end
 
     def tags_to_s
-      CloudscaleCostExplorer.tags_to_s(tags)
+      Cloudcost.tags_to_s(tags)
     end
 
     def storage_size(type = :ssd)

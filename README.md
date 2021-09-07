@@ -1,4 +1,4 @@
-# cloudscale.ch Cost Explorer
+# cloudcost - cloudscale.ch Cost Explorer
 
 A CLI-tool which helps you explore costs on [cloudscale.ch](https://www.cloudscale.ch).
 
@@ -17,7 +17,7 @@ bundle install
 
 ## Configure API-Auth
 
-cloudscale_cost_explorer does support the same auth configuration options as [cloudscale-cli](https://cloudscale-ch.github.io/cloudscale-cli/).
+cloudcost does support the same auth configuration options as [cloudscale-cli](https://cloudscale-ch.github.io/cloudscale-cli/).
 
 You can manage multiple profiles using `cloudscale.ini` files ([see here](https://cloudscale-ch.github.io/cloudscale-cli/auth/) for instructions). 
 
@@ -39,13 +39,13 @@ or you can directly pass a token as a argument to the command: `--api-token HELP
 Display help:
 
 ```sh
-cloudscale_cost_explorer help
+cloudcost help
 ```
 
 Describe the server command:
 
 ```sh
-cloudscale_cost_explorer help server
+cloudcost help server
 ```
 
 ### Servers
@@ -55,7 +55,7 @@ cloudscale_cost_explorer help server
 List all servers from the given environment:
 
 ```sh
-cloudscale_cost_explorer servers
+cloudcost servers
 ```
 
 #### Summary
@@ -63,7 +63,7 @@ cloudscale_cost_explorer servers
 Only show summarized usage:
 
 ```sh
-cloudscale_cost_explorer servers --summary
+cloudcost servers --summary
 ```
 
 #### Output CSV
@@ -71,7 +71,7 @@ cloudscale_cost_explorer servers --summary
 Output in CSV format instead of a table:
 
 ```sh
-cloudscale_cost_explorer servers --output csv
+cloudcost servers --output csv
 ```
 
 #### Filter by name
@@ -80,10 +80,10 @@ Filter by servers by regex on name:
 
 ```sh
 # only show servers which names include a k8s or rancher:
-cloudscale_cost_explorer servers --name "k8s|rancher"
+cloudcost servers --name "k8s|rancher"
 
 # exclude different name patterns
-cloudscale_cost_explorer servers --name "^[^ocp|^k8s|^rancher].*"
+cloudcost servers --name "^[^ocp|^k8s|^rancher].*"
 ```
 
 #### Filter by tag
@@ -91,13 +91,13 @@ cloudscale_cost_explorer servers --name "^[^ocp|^k8s|^rancher].*"
 Filter servers by tag key:
 
 ```sh
-cloudscale_cost_explorer servers --tag pitc_service
+cloudcost servers --tag pitc_service
 ```
 
 Filter servers by tag value:
 
 ```sh
-cloudscale_cost_explorer servers --tag pitc_service=ocp4
+cloudcost servers --tag pitc_service=ocp4
 ```
 
 ### Server Tags
@@ -107,7 +107,7 @@ cloudscale_cost_explorer servers --tag pitc_service=ocp4
 Display a list of servers and show theire tags:
 
 ```sh
-cloudscale_cost_explorer server-tags
+cloudcost server-tags
 ```
 
 Note thats the same filter options as with the `servers` command apply.
@@ -117,7 +117,7 @@ Note thats the same filter options as with the `servers` command apply.
 Only show servers which do NOT have a tag-key named "budget-group":
 
 ```sh
-cloudscale_cost_explorer server-tags --missing-tag budget-group
+cloudcost server-tags --missing-tag budget-group
 ```
 
 Note that this option can also be combined with `set-tags` or any other option.
@@ -125,11 +125,11 @@ Note that this option can also be combined with `set-tags` or any other option.
 #### Set tags
 
 ```sh
-cloudscale_cost_explorer server-tags --name ldap --set-tags owner=sys budget-group=base-infrastructure
+cloudcost server-tags --name ldap --set-tags owner=sys budget-group=base-infrastructure
 ```
 
 #### Remove tags
 
 ```sh
-cloudscale_cost_explorer server-tags --name ldap --remove-tags owner budget-group
+cloudcost server-tags --name ldap --remove-tags owner budget-group
 ```
