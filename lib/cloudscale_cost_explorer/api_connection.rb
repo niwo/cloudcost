@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 require "excon"
 require "json"
 
 module CloudscaleCostExplorer
   class ApiConnection
-    API_URL = 'https://api.cloudscale.ch'
+    API_URL = "https://api.cloudscale.ch"
 
     attr_accessor :connection
 
     def initialize(api_token, options = {})
       @api_url = options[:api_url] || API_URL
       @api_token = api_token
-      @connection = new_connection()
+      @connection = new_connection
     end
 
     def get_resource(resource, options = {})
@@ -22,12 +24,8 @@ module CloudscaleCostExplorer
 
     def get_servers(options = {})
       servers = get_resource("servers", options)
-      if options[:missing_tag]
-        servers = servers.select { |server| !server[:tags].key?(options[:missing_tag].to_sym) }
-      end
-      if options[:name]
-        servers = servers.select { |server| /#{options[:name]}/.match? server[:name] }
-      end
+      servers = servers.reject { |server| server[:tags].key?(options[:missing_tag].to_sym) } if options[:missing_tag]
+      servers = servers.select { |server| /#{options[:name]}/.match? server[:name] } if options[:name]
       servers
     end
 
@@ -43,14 +41,13 @@ module CloudscaleCostExplorer
     private
 
     def new_connection
-      connection = Excon.new(
-        @api_url, headers: auth_header()
+      Excon.new(
+        @api_url, headers: auth_header
       )
     end
 
     def auth_header
       { "Authorization" => "Bearer #{@api_token}" }
     end
-
   end
 end
