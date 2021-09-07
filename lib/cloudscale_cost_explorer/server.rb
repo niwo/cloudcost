@@ -1,9 +1,10 @@
+# frozen_string_literal: true
+
 require "cloudscale_cost_explorer/pricing"
 
 module CloudscaleCostExplorer
-
   def self.tags_to_s(tag_hash = [])
-    tag_hash.map {|k,v| "#{k}=#{v}" }.join(" ")
+    tag_hash.map { |k, v| "#{k}=#{v}" }.join(" ")
   end
 
   class Server
@@ -37,7 +38,7 @@ module CloudscaleCostExplorer
     end
 
     def tags_to_s
-      CloudscaleCostExplorer::tags_to_s(tags)
+      CloudscaleCostExplorer.tags_to_s(tags)
     end
 
     def storage_size(type = :ssd)
@@ -53,18 +54,16 @@ module CloudscaleCostExplorer
     end
 
     def total_costs_per_day
-      server_costs_per_day + storage_costs_per_day(:ssd) + storage_costs_per_day(:bulk) 
+      server_costs_per_day + storage_costs_per_day(:ssd) + storage_costs_per_day(:bulk)
     end
 
     def sum_up_storage_per_type
       sum = {}
-      @data[:volumes].group_by {|volume| volume[:type].itself }.each do |group, vols|
-        sum.store(group.to_sym,  0)
+      @data[:volumes].group_by { |volume| volume[:type].itself }.each do |group, vols|
+        sum.store(group.to_sym, 0)
         vols.each { |volume| sum[volume[:type].to_sym] += volume[:size_gb] }
       end
       sum
     end
-
   end
-
 end

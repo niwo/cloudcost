@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 require "thor"
 require "tty-spinner"
 
 module CloudscaleCostExplorer
-
   class CLI < Thor
     # Error raised by this runner
     Error = Class.new(StandardError)
@@ -12,24 +13,24 @@ module CloudscaleCostExplorer
     end
 
     class_option :profile,
-      desc: "cloudscale.ini profile name",
-      aliases: %w(-p)
+                 desc: "cloudscale.ini profile name",
+                 aliases: %w[-p]
 
     class_option :api_token,
-      desc: "cloudscale api token",
-      aliases: %w(-a)
+                 desc: "cloudscale api token",
+                 aliases: %w[-a]
 
     desc "version", "app version"
     def version
       puts "cloudscale_cost_explorer v#{CloudscaleCostExplorer::VERSION}"
     end
-    map %w(--version -v) => :version
+    map %w[--version -v] => :version
 
     desc "servers", "explore servers"
-    option :name, desc: "filter name by regex", aliases: %w(-n)
-    option :tag, desc: "filter servers by tag", aliases: %w(-t)
-    option :summary, desc: "display totals only", type: :boolean, aliases: %w(-S)
-    option :output, default: "table", enum: %w(table csv), desc: "output format", aliases: %w(-o)
+    option :name, desc: "filter name by regex", aliases: %w[-n]
+    option :tag, desc: "filter servers by tag", aliases: %w[-t]
+    option :summary, desc: "display totals only", type: :boolean, aliases: %w[-S]
+    option :output, default: "table", enum: %w[table csv], desc: "output format", aliases: %w[-o]
     def servers
       servers = load_servers(options)
       spinner = TTY::Spinner.new("[:spinner] Calculating costs...", clear: options[:csv])
@@ -37,7 +38,7 @@ module CloudscaleCostExplorer
       output(servers, options) do |result|
         spinner.success "(done)"
         puts
-        puts result 
+        puts result
       end
     rescue Excon::Error, TokenError, ProfileError, PricingError => e
       error_message = "ERROR: #{e.message}"
@@ -49,30 +50,30 @@ module CloudscaleCostExplorer
     end
 
     desc "server-tags", "show and assign tags of servers"
-    option :name, desc: "filter name by regex", aliases: %w(-n)
-    option :tag, desc: "filter servers by tag", aliases: %w(-t)
+    option :name, desc: "filter name by regex", aliases: %w[-n]
+    option :tag, desc: "filter servers by tag", aliases: %w[-t]
     option :set_tags,
-            desc: "set tags",
-            aliases: %w(-T),
-            type: :array
+           desc: "set tags",
+           aliases: %w[-T],
+           type: :array
     option :remove_tags,
-            desc: "remove tags",
-            aliases: %w(-D),
-            type: :array
+           desc: "remove tags",
+           aliases: %w[-D],
+           type: :array
     option :missing_tag,
-            desc: "show severs with missing tags",
-            aliases: %w(-M)
+           desc: "show severs with missing tags",
+           aliases: %w[-M]
     def server_tags
       servers = load_servers(options)
-      servers.size > 0 ? puts(CloudscaleCostExplorer::ServerList.new(servers, options).tags_table) : exit
+      servers.size.positive? ? puts(CloudscaleCostExplorer::ServerList.new(servers, options).tags_table) : exit
       if (options[:set_tags] || options[:remove_tags]) && ask(
         "Do you want to #{tag_option_to_s(options)}?",
         default: "n"
-        ) == "y"
+      ) == "y"
         spinners = TTY::Spinner::Multi.new("[:spinner] Settings server tags")
         servers.each do |server|
           spinners.register("[:spinner] #{server.name}") do |spinner|
-            tags = server.tags.merge( options[:set_tags] ? tags_to_h(options[:set_tags]) : {} )
+            tags = server.tags.merge(options[:set_tags] ? tags_to_h(options[:set_tags]) : {})
             (options[:remove_tags] || []).each do |tag|
               tags.reject! { |k| k == tag.to_sym }
             end
@@ -95,9 +96,9 @@ module CloudscaleCostExplorer
       def tags_to_h(tags_array)
         tags_hash = {}
         tags_array.each do |tag|
-          k_v = tag.split("=") 
+          k_v = tag.split("=")
           tags_hash[k_v[0].to_sym] = k_v[1]
-        end 
+        end
         tags_hash
       end
 
@@ -124,16 +125,10 @@ module CloudscaleCostExplorer
 
       def tag_option_to_s(options)
         messages = []
-        if options[:set_tags]
-          messages << "set tags \"#{options[:set_tags].join(', ')}\""
-        end
-        if options[:remove_tags]
-          messages << "remove tags \"#{options[:remove_tags].join(', ')}\""
-        end
+        messages << "set tags \"#{options[:set_tags].join(", ")}\"" if options[:set_tags]
+        messages << "remove tags \"#{options[:remove_tags].join(", ")}\"" if options[:remove_tags]
         messages.join(" and ")
       end
     end
-
   end
-
 end

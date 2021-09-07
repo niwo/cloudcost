@@ -1,7 +1,7 @@
+# frozen_string_literal: true
+
 module CloudscaleCostExplorer
-
   class ServerList
-
     def initialize(servers, options = {})
       @servers = servers
       @options = options
@@ -20,26 +20,26 @@ module CloudscaleCostExplorer
     end
 
     def headings
-      headings = @options[:summary] ? [""] : %w(Name UUID Flavor Tags) 
+      headings = @options[:summary] ? [""] : %w[Name UUID Flavor Tags]
       headings.concat ["vCPU's", "Memory [GB]", "SSD [GB]", "Bulk [GB]", "CHF/day", "CHF/30-days"]
     end
 
     def rows
       rows = []
       unless @options[:summary]
-        @servers.sort_by{ |s| s.name }.map do |server|
-            rows << [
-              server.name,
-              server.uuid,
-              server.flavor,
-              server.tags_to_s,
-              server.vcpu_count,
-              server.memory_gb,
-              server.storage_size(:ssd),
-              server.storage_size(:bulk),
-              sprintf("%.2f", server.total_costs_per_day.round(2)),
-              sprintf("%.2f", (server.total_costs_per_day * 30).round(2))
-            ]
+        @servers.sort_by(&:name).map do |server|
+          rows << [
+            server.name,
+            server.uuid,
+            server.flavor,
+            server.tags_to_s,
+            server.vcpu_count,
+            server.memory_gb,
+            server.storage_size(:ssd),
+            server.storage_size(:bulk),
+            format("%.2f", server.total_costs_per_day.round(2)),
+            format("%.2f", (server.total_costs_per_day * 30).round(2))
+          ]
         end
       end
       rows
@@ -47,14 +47,14 @@ module CloudscaleCostExplorer
 
     def totals
       totals = calculate_totals
-      total_row = @options[:summary] ? %w(Total) : ["Total", "", "", ""]
+      total_row = @options[:summary] ? %w[Total] : ["Total", "", "", ""]
       total_row.concat [
-        totals[:vcpu], 
+        totals[:vcpu],
         totals[:memory],
         totals[:ssd],
         totals[:bulk],
-        sprintf("%.2f", totals[:cost].round(2)),
-        sprintf("%.2f", (totals[:cost] * 30).round(2))
+        format("%.2f", totals[:cost].round(2)),
+        format("%.2f", (totals[:cost] * 30).round(2))
       ]
     end
 
@@ -62,8 +62,8 @@ module CloudscaleCostExplorer
       Terminal::Table.new do |t|
         t.title = "cloudscale.ch server tags"
         t.title += " (#{@options[:profile]})" if @options[:profile]
-        t.headings = %w(Name UUID Tags)
-        t.rows = @servers.sort_by{ |s| s.name }.map do |server|
+        t.headings = %w[Name UUID Tags]
+        t.rows = @servers.sort_by(&:name).map do |server|
           [
             server.name,
             server.uuid,
@@ -80,11 +80,11 @@ module CloudscaleCostExplorer
         t.headings = headings
         t.rows = rows unless @options[:summary]
       end
-  
+
       table.add_separator unless @options[:summary]
       table.add_row totals
       first_number_row = @options[:summary] ? 1 : 2
-      (first_number_row..table.columns.size).each {|column| table.align_column(column, :right) }
+      (first_number_row..table.columns.size).each { |column| table.align_column(column, :right) }
       table
     end
 
@@ -98,7 +98,5 @@ module CloudscaleCostExplorer
         end
       end
     end
-
   end
-
 end
