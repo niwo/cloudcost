@@ -8,6 +8,8 @@ module Cloudcost
   end
 
   class Server
+    attr_accessor :data
+
     def initialize(data)
       @data = data
       @total_storage_per_type = sum_up_storage_per_type
@@ -33,6 +35,10 @@ module Cloudcost
       @data[:flavor][:memory_gb]
     end
 
+    def volumes
+      @data[:volumes]
+    end
+
     def tags
       @data[:tags]
     end
@@ -46,7 +52,7 @@ module Cloudcost
     end
 
     def server_costs_per_day
-      Pricing.server_costs_per_day(@data[:flavor][:slug])
+      Pricing.server_costs_per_day(flavor)
     end
 
     def storage_costs_per_day(type = :ssd)
@@ -59,7 +65,7 @@ module Cloudcost
 
     def sum_up_storage_per_type
       sum = {}
-      @data[:volumes].group_by { |volume| volume[:type].itself }.each do |group, vols|
+      volumes.group_by { |volume| volume[:type].itself }.each do |group, vols|
         sum.store(group.to_sym, 0)
         vols.each { |volume| sum[volume[:type].to_sym] += volume[:size_gb] }
       end

@@ -30,8 +30,6 @@ export CLOUDSCALE_API_TOKEN=HELPIMTRAPPEDINATOKENGENERATOR
 
 or you can directly pass a token as a argument to the command: `--api-token HELPIMTRAPPEDINATOKENGENERATOR`
 
-**NOTE:** The API_TOKEN does only require read access.
-
 ## Usage
 
 ### Help
@@ -66,7 +64,30 @@ Only show summarized usage:
 cloudcost servers --summary
 ```
 
-#### Output CSV
+#### Group and summarize by tag
+
+By using the `--tag-by` option, you can summarize usage by tag:
+
+```sh
+cloudcost servers --group-by budget-group
+```
+
+#### Influx Line Protocol output
+
+The CLI also supports output in Influxdb Line Protocol format when using the `--group-by` option:
+
+```sh
+cloudcost servers --group-by budget-group --output influx
+```
+
+The output can directly ba pipped to the influxdb CLI:
+
+```sh
+cloudcost servers --group-by budget-group --profile prod | \
+influx write --bucket my-bucket --org my-org --token my-super-secret-auth-token
+```
+
+#### CSV Output
 
 Output in CSV format instead of a table:
 
@@ -91,13 +112,13 @@ cloudcost servers --name "^[^ocp|^k8s|^rancher].*"
 Filter servers by tag key:
 
 ```sh
-cloudcost servers --tag pitc_service
+cloudcost servers --tag service
 ```
 
 Filter servers by tag value:
 
 ```sh
-cloudcost servers --tag pitc_service=ocp4
+cloudcost servers --tag service=ocp4
 ```
 
 ### Server Tags
