@@ -7,9 +7,9 @@ module Cloudcost
       @options = options
     end
 
-    def calculate_totals
+    def calculate_totals(servers = @servers)
       totals = { vcpu: 0, memory: 0, ssd: 0, bulk: 0, cost: 0.0 }
-      @servers.each do |server|
+      servers.each do |server|
         totals[:vcpu] += server.vcpu_count
         totals[:memory] += server.memory_gb
         totals[:ssd] += server.storage_size(:ssd)
@@ -20,33 +20,37 @@ module Cloudcost
     end
 
     def headings
-      headings = @options[:summary] ? [""] : %w[Name UUID Flavor Tags]
+      headings = if @options[:summary]
+        [""]
+      elsif @options[:group_by]
+        ["Group",  "Servers"]
+      else
+        %w[Name UUID Flavor Tags]
+      end
       headings.concat ["vCPU's", "Memory [GB]", "SSD [GB]", "Bulk [GB]", "CHF/day", "CHF/30-days"]
     end
 
     def rows
       rows = []
-      unless @options[:summary]
-        @servers.sort_by(&:name).map do |server|
-          rows << [
-            server.name,
-            server.uuid,
-            server.flavor,
-            server.tags_to_s,
-            server.vcpu_count,
-            server.memory_gb,
-            server.storage_size(:ssd),
-            server.storage_size(:bulk),
-            format("%.2f", server.total_costs_per_day.round(2)),
-            format("%.2f", (server.total_costs_per_day * 30).round(2))
-          ]
-        end
+      @servers.sort_by(&:name).map do |server|
+        rows << [
+          server.name,
+          server.uuid,
+          server.flavor,
+          server.tags_to_s,
+          server.vcpu_count,
+          server.memory_gb,
+          server.storage_size(:ssd),
+          server.storage_size(:bulk),
+          format("%.2f", server.total_costs_per_day.round(2)),
+          format("%.2f", (server.total_costs_per_day * 30).round(2))
+        ]
       end
       rows
     end
 
-    def totals
-      totals = calculate_totals
+    def totals(servers = @servers)
+      totals = calculate_totals(servers)
       total_row = @options[:summary] ? %w[Total] : ["Total", "", "", ""]
       total_row.concat [
         totals[:vcpu],
@@ -88,6 +92,58 @@ module Cloudcost
       table
     end
 
+    def grouped_cost_table
+      no_tag = "<no-tag>"
+      group_rows = @servers.group_by {|s| s.tags[@options[:group_by].to_sym] || no_tag }.map do |name, servers|
+        server_groups_data(name, servers).values.flatten
+      end.sort {|a, b| a[0] == no_tag ? 1 : a[0] <=> b[0] }
+      if @options[:output] == "csv"
+        CSV.generate do |csv|
+          csv << headings
+          group_rows.each { |row| csv << row }
+        end
+      elsif @options[:output] == "influx"
+        lines = []
+        group_rows.each do |row|
+          [
+            { field: "server_count", position: 1, unit: "i" },
+            { field: "vcpus", position: 2, unit: "i" },
+            { field: "memory_gb", position: 3, unit: "i" },
+            { field: "ssd_gb", position: 4, unit: "i" },
+            { field: "bulk_gb", position: 5, unit: "i" },
+            { field: "cost_per_day", position: 6, unit: "" },
+          ].each do |field| 
+            lines << "cloudscaleServerCosts,grouped_by=#{@options[:group_by]},group=#{row[0]},environment=#{@options[:profile] || "default"},currency=CHF #{field[:field]}=#{row[field[:position]]}#{field[:unit]}"
+          end
+        end
+        lines.join("\n")
+      else
+        table = Terminal::Table.new do |t|
+          t.title = "cloudscale.ch server costs grouped by tag \"#{@options[:group_by]}\""
+          t.title += " (#{@options[:profile]})" if @options[:profile]
+          t.headings = headings
+        end
+        table.rows = group_rows
+        (1..table.columns.size).each { |column| table.align_column(column, :right) }
+        table
+      end
+    end
+
+    def server_groups_data(name, servers)
+      data = { name: name, count: 0, vcpu: 0, memory: 0, ssd: 0, bulk: 0, costs_daily: 0 }
+      servers.each do |server|
+        data[:count] += 1
+        data[:vcpu] += server.vcpu_count
+        data[:memory] += server.memory_gb
+        data[:ssd] += server.storage_size(:ssd)
+        data[:bulk] += server.storage_size(:bulk)
+        data[:costs_daily] += server.total_costs_per_day
+      end
+      data[:costs_monthly] = (data[:costs_daily] * 30).round(2)
+      data[:costs_daily] = data[:costs_daily].round(2)
+      data
+    end
+
     def to_csv
       CSV.generate do |csv|
         csv << headings
@@ -98,5 +154,6 @@ module Cloudcost
         end
       end
     end
+
   end
 end

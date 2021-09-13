@@ -30,14 +30,16 @@ module Cloudcost
     option :name, desc: "filter name by regex", aliases: %w[-n]
     option :tag, desc: "filter servers by tag", aliases: %w[-t]
     option :summary, desc: "display totals only", type: :boolean, aliases: %w[-S]
-    option :output, default: "table", enum: %w[table csv], desc: "output format", aliases: %w[-o]
+    option :group_by, desc: "group by tag", aliases: %w[-G]
+    option :output, default: "table", enum: %w[table csv influx], desc: "output format", aliases: %w[-o]
     def servers
       servers = load_servers(options)
-      spinner = TTY::Spinner.new("[:spinner] Calculating costs...", clear: options[:csv])
-      spinner.auto_spin
+      if options[:output] == "table"
+        spinner = TTY::Spinner.new("[:spinner] Calculating costs...", clear: options[:csv])
+        spinner.auto_spin
+      end
       output(servers, options) do |result|
-        spinner.success "(done)"
-        puts
+        spinner.success("(done)") if spinner
         puts result
       end
     rescue Excon::Error, TokenError, ProfileError, PricingError => e
@@ -108,15 +110,19 @@ module Cloudcost
       end
 
       def load_servers(options)
-        spinner = TTY::Spinner.new("[:spinner] Loading servers...", clear: options[:csv])
-        spinner.auto_spin
+        if options[:output] == "table"
+          spinner = TTY::Spinner.new("[:spinner] Loading servers...", clear: options[:csv])
+          spinner.auto_spin
+        end
         servers = api_connection(options).get_servers(options).map { |server| Server.new(server) }
-        spinner.success "(#{servers.size} found)"
+        spinner.success "(#{servers.size} found)" if spinner
         servers
       end
 
       def output(servers, options)
-        if options[:output] == "csv"
+        if options[:group_by]
+          yield Cloudcost::ServerList.new(servers, options).grouped_cost_table
+        elsif options[:output] == "csv"
           yield Cloudcost::ServerList.new(servers, options).to_csv
         else
           yield Cloudcost::ServerList.new(servers, options).cost_table
