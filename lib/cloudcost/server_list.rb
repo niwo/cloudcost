@@ -111,9 +111,9 @@ module Cloudcost
             { field: "memory_gb", position: 3, unit: "i" },
             { field: "ssd_gb", position: 4, unit: "i" },
             { field: "bulk_gb", position: 5, unit: "i" },
-            { field: "cost_per_day", position: 6, unit: "" },
+            { field: "chf_per_day", position: 6, unit: "" },
           ].each do |field| 
-            lines << "cloudscaleServerCosts,grouped_by=#{@options[:group_by]},group=#{row[0]},environment=#{@options[:profile] || "default"},currency=CHF #{field[:field]}=#{row[field[:position]]}#{field[:unit]}"
+            lines << "cloudscaleServerCosts,group=#{row[0]},profile=#{@options[:profile] || "?"} #{field[:field]}=#{row[field[:position]]}#{field[:unit]}"
           end
         end
         lines.join("\n")
