@@ -2,7 +2,9 @@
 
 require "yaml"
 
-PRICING = YAML.load_file("data/pricing.yml")
+PRICING = YAML.load_file( File.join(
+  File.expand_path("../..", __dir__), "data/pricing.yml")
+)
 
 module Cloudcost
   class PricingError < StandardError
