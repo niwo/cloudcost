@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
 module Cloudcost
+  # ServerList represents a list of servers and integrates several output methods
   class ServerList
+    include Cloudcost::TabularOutput
+    include Cloudcost::CsvOutput
+    include Cloudcost::InfluxdbOutput
+
     def initialize(servers, options = {})
       @servers = servers
       @options = options
@@ -19,36 +24,6 @@ module Cloudcost
       totals
     end
 
-    def headings
-      headings = if @options[:summary]
-        [""]
-      elsif @options[:group_by]
-        ["Group",  "Servers"]
-      else
-        %w[Name UUID Flavor Tags]
-      end
-      headings.concat ["vCPU's", "Memory [GB]", "SSD [GB]", "Bulk [GB]", "CHF/day", "CHF/30-days"]
-    end
-
-    def rows
-      rows = []
-      @servers.sort_by(&:name).map do |server|
-        rows << [
-          server.name,
-          server.uuid,
-          server.flavor,
-          server.tags_to_s,
-          server.vcpu_count,
-          server.memory_gb,
-          server.storage_size(:ssd),
-          server.storage_size(:bulk),
-          format("%.2f", server.total_costs_per_day.round(2)),
-          format("%.2f", (server.total_costs_per_day * 30).round(2))
-        ]
-      end
-      rows
-    end
-
     def totals(servers = @servers)
       totals = calculate_totals(servers)
       total_row = @options[:summary] ? %w[Total] : ["Total", "", "", ""]
@@ -62,70 +37,19 @@ module Cloudcost
       ]
     end
 
-    def tags_table
-      Terminal::Table.new do |t|
-        t.title = "cloudscale.ch server tags"
-        t.title += " (#{@options[:profile]})" if @options[:profile]
-        t.headings = %w[Name UUID Tags]
-        t.rows = @servers.sort_by(&:name).map do |server|
-          [
-            server.name,
-            server.uuid,
-            server.tags_to_s
-          ]
-        end
-      end
-    end
-
-    def cost_table
-      table = Terminal::Table.new do |t|
-        t.title = "cloudscale.ch server costs"
-        t.title += " (#{@options[:profile]})" if @options[:profile]
-        t.headings = headings
-        t.rows = rows unless @options[:summary]
-      end
-
-      table.add_separator unless @options[:summary]
-      table.add_row totals
-      first_number_row = @options[:summary] ? 1 : 2
-      (first_number_row..table.columns.size).each { |column| table.align_column(column, :right) }
-      table
-    end
-
-    def grouped_cost_table
+    def grouped_costs
       no_tag = "<no-tag>"
-      group_rows = @servers.group_by {|s| s.tags[@options[:group_by].to_sym] || no_tag }.map do |name, servers|
+      group_rows = @servers.group_by { |s| s.tags[@options[:group_by].to_sym] || no_tag }.map do |name, servers|
         server_groups_data(name, servers).values.flatten
-      end.sort {|a, b| a[0] == no_tag ? 1 : a[0] <=> b[0] }
-      if @options[:output] == "csv"
-        CSV.generate do |csv|
-          csv << headings
-          group_rows.each { |row| csv << row }
-        end
-      elsif @options[:output] == "influx"
-        lines = []
-        group_rows.each do |row|
-          [
-            { field: "server_count", position: 1, unit: "i" },
-            { field: "vcpus", position: 2, unit: "i" },
-            { field: "memory_gb", position: 3, unit: "i" },
-            { field: "ssd_gb", position: 4, unit: "i" },
-            { field: "bulk_gb", position: 5, unit: "i" },
-            { field: "chf_per_day", position: 6, unit: "" },
-          ].each do |field| 
-            lines << "cloudscaleServerCosts,group=#{row[0]},profile=#{@options[:profile] || "?"} #{field[:field]}=#{row[field[:position]]}#{field[:unit]}"
-          end
-        end
-        lines.join("\n")
+      end
+      group_rows.sort! { |a, b| a[0] == no_tag ? 1 : a[0] <=> b[0] }
+      case @options[:output]
+      when "csv"
+        groups_to_csv(group_rows)
+      when "influx"
+        grouped_influx_line_protocol(group_rows)
       else
-        table = Terminal::Table.new do |t|
-          t.title = "cloudscale.ch server costs grouped by tag \"#{@options[:group_by]}\""
-          t.title += " (#{@options[:profile]})" if @options[:profile]
-          t.headings = headings
-        end
-        table.rows = group_rows
-        (1..table.columns.size).each { |column| table.align_column(column, :right) }
-        table
+        grouped_cost_table(group_rows)
       end
     end
 
@@ -143,17 +67,5 @@ module Cloudcost
       data[:costs_daily] = data[:costs_daily].round(2)
       data
     end
-
-    def to_csv
-      CSV.generate do |csv|
-        csv << headings
-        if @options[:summary]
-          csv << totals
-        else
-          rows.each { |row| csv << row }
-        end
-      end
-    end
-
   end
 end

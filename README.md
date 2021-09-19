@@ -66,7 +66,7 @@ cloudcost servers --summary
 
 #### Group and summarize by tag
 
-By using the `--tag-by` option, you can summarize usage by tag:
+By using the `--group-by` option, you can summarize usage by tag:
 
 ```sh
 cloudcost servers --group-by budget-group
@@ -85,6 +85,19 @@ The output can directly ba pipped to the influxdb CLI:
 ```sh
 cloudcost servers --group-by budget-group --profile prod | \
 influx write --bucket my-bucket --org my-org --token my-super-secret-auth-token
+```
+
+Example Flux-Query for loading data from InfluxDB:
+
+```sh
+influx query --org my-org --token my-super-secret-auth-token \
+'from(bucket:"my-bucket")
+  |> range(start: -1d)
+  |> filter(fn: (r) =>
+    r._measurement == "cloudscaleServerCosts" and
+    r._field == "cost_per_day") and
+    r.profile == "prod" and 
+    r.group == "my-budget-group"'
 ```
 
 #### CSV Output

@@ -4,6 +4,7 @@ require "thor"
 require "tty-spinner"
 
 module Cloudcost
+  # Implementaion of CLI functionality
   class CLI < Thor
     # Error raised by this runner
     Error = Class.new(StandardError)
@@ -39,7 +40,7 @@ module Cloudcost
         spinner.auto_spin
       end
       output(servers, options) do |result|
-        spinner.success("(done)") if spinner
+        spinner&.success("(done)")
         puts result
       end
     rescue Excon::Error, TokenError, ProfileError, PricingError => e
@@ -115,16 +116,20 @@ module Cloudcost
           spinner.auto_spin
         end
         servers = api_connection(options).get_servers(options).map { |server| Server.new(server) }
-        spinner.success "(#{servers.size} found)" if spinner
+        spinner&.success "(#{servers.size} found)"
         servers
       end
 
       def output(servers, options)
         if options[:group_by]
-          yield Cloudcost::ServerList.new(servers, options).grouped_cost_table
+          yield Cloudcost::ServerList.new(servers, options).grouped_costs
         elsif options[:output] == "csv"
           yield Cloudcost::ServerList.new(servers, options).to_csv
         else
+          if options[:output] == "influx"
+            puts "ERROR: group-by option required for influx output"
+            exit 1
+          end
           yield Cloudcost::ServerList.new(servers, options).cost_table
         end
       end
