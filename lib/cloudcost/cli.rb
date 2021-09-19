@@ -39,7 +39,7 @@ module Cloudcost
         spinner = TTY::Spinner.new("[:spinner] Calculating costs...", clear: options[:csv])
         spinner.auto_spin
       end
-      output(servers, options) do |result|
+      output_servers(servers, options) do |result|
         spinner&.success("(done)")
         puts result
       end
@@ -54,7 +54,7 @@ module Cloudcost
 
     desc "server-tags", "show and assign tags of servers"
     option :name, desc: "filter name by regex", aliases: %w[-n]
-    option :tag, desc: "filter servers by tag", aliases: %w[-t]
+    option :tag, desc: "filter by tag", aliases: %w[-t]
     option :set_tags,
            desc: "set tags",
            aliases: %w[-T],
@@ -95,6 +95,31 @@ module Cloudcost
       end
     end
 
+    desc "volumes", "explore volumes"
+    option :name, desc: "filter name by regex", aliases: %w[-n]
+    option :tag, desc: "filter by tag", aliases: %w[-t]
+    option :summary, desc: "display totals only", type: :boolean, aliases: %w[-S]
+    option :type, enum: %w[ssd bulk], desc: "volume type"
+    option :attached, type: :boolean, desc: "volume attached to servers"
+    def volumes
+      volumes = load_volumes(options)
+      if options[:output] == "table"
+        spinner = TTY::Spinner.new("[:spinner] Calculating costs...", clear: options[:csv])
+        spinner.auto_spin
+      end
+      output_volumes(volumes, options) do |result|
+        spinner&.success("(done)")
+        puts result
+      end
+    rescue Excon::Error, TokenError, ProfileError, PricingError => e
+      error_message = "ERROR: #{e.message}"
+      if spinner
+        spinner.error("(#{error_message})")
+      else
+        puts error_message
+      end
+    end
+
     no_tasks do
       def tags_to_h(tags_array)
         tags_hash = {}
@@ -120,7 +145,17 @@ module Cloudcost
         servers
       end
 
-      def output(servers, options)
+      def load_volumes(options)
+        if options[:output] == "table"
+          spinner = TTY::Spinner.new("[:spinner] Loading volumes...", clear: options[:csv])
+          spinner.auto_spin
+        end
+        volumes = api_connection(options).get_volumes(options).map { |volume| Volume.new(volume) }
+        spinner&.success "(#{volumes.size} found)"
+        volumes
+      end
+
+      def output_servers(servers, options)
         if options[:group_by]
           yield Cloudcost::ServerList.new(servers, options).grouped_costs
         elsif options[:output] == "csv"
@@ -132,6 +167,10 @@ module Cloudcost
           end
           yield Cloudcost::ServerList.new(servers, options).cost_table
         end
+      end
+
+      def output_volumes(volumes, options)
+        yield Cloudcost::VolumeList.new(volumes, options).cost_table
       end
 
       def tag_option_to_s(options)

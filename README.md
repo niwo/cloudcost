@@ -167,3 +167,29 @@ cloudcost server-tags --name ldap --set-tags owner=sys budget-group=base-infrast
 ```sh
 cloudcost server-tags --name ldap --remove-tags owner budget-group
 ```
+
+### Volumes
+
+List all volumes:
+
+```sh
+cloudcost volumes
+```
+
+Only list volumes of type `bulk`
+
+```sh
+cloudcost volumes --type bulk
+```
+
+List volumes which are not attached to a server:
+
+```sh
+cloudcost volumes --no-attached
+```
+
+Filter volumes by names:
+
+```sh
+cloudcost volumes --name "pvc"
+``
