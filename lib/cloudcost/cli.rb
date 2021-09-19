@@ -4,6 +4,7 @@ require "thor"
 require "tty-spinner"
 
 module Cloudcost
+  # Implementaion of CLI functionality
   class CLI < Thor
     # Error raised by this runner
     Error = Class.new(StandardError)
@@ -38,8 +39,8 @@ module Cloudcost
         spinner = TTY::Spinner.new("[:spinner] Calculating costs...", clear: options[:csv])
         spinner.auto_spin
       end
-      output(servers, options) do |result|
-        spinner.success("(done)") if spinner
+      output_servers(servers, options) do |result|
+        spinner&.success("(done)")
         puts result
       end
     rescue Excon::Error, TokenError, ProfileError, PricingError => e
@@ -53,7 +54,7 @@ module Cloudcost
 
     desc "server-tags", "show and assign tags of servers"
     option :name, desc: "filter name by regex", aliases: %w[-n]
-    option :tag, desc: "filter servers by tag", aliases: %w[-t]
+    option :tag, desc: "filter by tag", aliases: %w[-t]
     option :set_tags,
            desc: "set tags",
            aliases: %w[-T],
@@ -94,6 +95,31 @@ module Cloudcost
       end
     end
 
+    desc "volumes", "explore volumes"
+    option :name, desc: "filter name by regex", aliases: %w[-n]
+    option :tag, desc: "filter by tag", aliases: %w[-t]
+    option :summary, desc: "display totals only", type: :boolean, aliases: %w[-S]
+    option :type, enum: %w[ssd bulk], desc: "volume type"
+    option :attached, type: :boolean, desc: "volume attached to servers"
+    def volumes
+      volumes = load_volumes(options)
+      if options[:output] == "table"
+        spinner = TTY::Spinner.new("[:spinner] Calculating costs...", clear: options[:csv])
+        spinner.auto_spin
+      end
+      output_volumes(volumes, options) do |result|
+        spinner&.success("(done)")
+        puts result
+      end
+    rescue Excon::Error, TokenError, ProfileError, PricingError => e
+      error_message = "ERROR: #{e.message}"
+      if spinner
+        spinner.error("(#{error_message})")
+      else
+        puts error_message
+      end
+    end
+
     no_tasks do
       def tags_to_h(tags_array)
         tags_hash = {}
@@ -115,18 +141,36 @@ module Cloudcost
           spinner.auto_spin
         end
         servers = api_connection(options).get_servers(options).map { |server| Server.new(server) }
-        spinner.success "(#{servers.size} found)" if spinner
+        spinner&.success "(#{servers.size} found)"
         servers
       end
 
-      def output(servers, options)
+      def load_volumes(options)
+        if options[:output] == "table"
+          spinner = TTY::Spinner.new("[:spinner] Loading volumes...", clear: options[:csv])
+          spinner.auto_spin
+        end
+        volumes = api_connection(options).get_volumes(options).map { |volume| Volume.new(volume) }
+        spinner&.success "(#{volumes.size} found)"
+        volumes
+      end
+
+      def output_servers(servers, options)
         if options[:group_by]
-          yield Cloudcost::ServerList.new(servers, options).grouped_cost_table
+          yield Cloudcost::ServerList.new(servers, options).grouped_costs
         elsif options[:output] == "csv"
           yield Cloudcost::ServerList.new(servers, options).to_csv
         else
+          if options[:output] == "influx"
+            puts "ERROR: group-by option required for influx output"
+            exit 1
+          end
           yield Cloudcost::ServerList.new(servers, options).cost_table
         end
+      end
+
+      def output_volumes(volumes, options)
+        yield Cloudcost::VolumeList.new(volumes, options).cost_table
       end
 
       def tag_option_to_s(options)

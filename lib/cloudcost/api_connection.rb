@@ -4,6 +4,7 @@ require "excon"
 require "json"
 
 module Cloudcost
+  # Connecting to and accessing the cloudscale.ch API
   class ApiConnection
     API_URL = "https://api.cloudscale.ch"
 
@@ -36,6 +37,15 @@ module Cloudcost
         headers: { "Content-Type": "application/json" },
         expects: [204]
       )
+    end
+
+    def get_volumes(options = {})
+      volumes = get_resource("volumes", options)
+      volumes = volumes.reject { |volume| volume[:tags].key?(options[:missing_tag].to_sym) } if options[:missing_tag]
+      volumes = volumes.select { |volume| /#{options[:name]}/.match? volume[:name] } if options[:name]
+      volumes = volumes.select { |volume| /#{options[:type]}/.match? volume[:type] } if options[:type]
+      volumes = volumes.select { |volume| (volume[:servers].size > 0) == options[:attached] } if options[:attached] != nil
+      volumes
     end
 
     private

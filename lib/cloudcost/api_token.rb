@@ -6,6 +6,7 @@ require "json"
 require "cloudcost/error"
 
 module Cloudcost
+  # Support for cloudscale-cli style API-tokens and profiles
   class ApiToken
     attr_accessor :profile, :token
 

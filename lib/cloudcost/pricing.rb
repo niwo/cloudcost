@@ -2,14 +2,15 @@
 
 require "yaml"
 
-PRICING = YAML.load_file( File.join(
-  File.expand_path("../..", __dir__), "data/pricing.yml")
-)
+PRICING = YAML.load_file(File.join(
+                           File.expand_path("../..", __dir__), "data/pricing.yml"
+                         ))
 
 module Cloudcost
   class PricingError < StandardError
   end
 
+  # pricing class which implements cost calculation methods for cloudscale.ch resources
   module Pricing
     def self.server_costs_per_day(flavor)
       PRICING["servers"][flavor] || raise(PricingError, "#{flavor} flavor not found in pricing.yml")

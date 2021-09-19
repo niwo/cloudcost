@@ -7,6 +7,7 @@ module Cloudcost
     tag_hash.map { |k, v| "#{k}=#{v}" }.join(" ")
   end
 
+  # Representation of cloudscale.ch server object
   class Server
     attr_accessor :data
 
