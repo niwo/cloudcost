@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
+require "terminal-table"
+
 module Cloudcost
   # Tabular output methods for the ServerList class
-  module TabularOutput
+  module ServerTabularOutput
     def headings
       headings = if @options[:summary]
                    [""]

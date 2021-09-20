@@ -6,4 +6,6 @@ module Cloudcost
   class ProfileError < Error; end
 
   class TokenError < Error; end
+
+  class PricingError < StandardError; end
 end
