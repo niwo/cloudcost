@@ -19,8 +19,7 @@ gem install cloudcost
 
 cloudcost does support the same auth configuration options as [cloudscale-cli](https://cloudscale-ch.github.io/cloudscale-cli/).
 
-You can manage multiple profiles using `cloudscale.ini` files ([see here](https://cloudscale-ch.github.io/cloudscale-cli/auth/) for instructions). 
-
+You can manage multiple profiles using `cloudscale.ini` files ([see here](https://cloudscale-ch.github.io/cloudscale-cli/auth/) for instructions).
 
 Otherwise you can export a `CLOUDSCALE_API_TOKEN` in your environment:
 

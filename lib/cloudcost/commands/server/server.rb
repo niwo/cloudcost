@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "cloudcost/pricing"
-
 module Cloudcost
   def self.tags_to_s(tag_hash = [])
     tag_hash.map { |k, v| "#{k}=#{v}" }.join(" ")

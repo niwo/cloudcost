@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
+require "terminal-table"
+
 module Cloudcost
   # volumeList represents a list of volumes and integrates several output methods
   class VolumeList
+
+    include Cloudcost::CsvOutput
 
     def initialize(volumes, options = {})
       @volumes = volumes
@@ -68,17 +72,6 @@ module Cloudcost
       table.add_row totals
       first_number_row = @options[:summary] ? 1 : 2
       (first_number_row..table.columns.size).each { |column| table.align_column(column, :right) }
-      table
-    end
-
-    def grouped_cost_table(group_rows)
-      table = Terminal::Table.new do |t|
-        t.title = "cloudscale.ch volume costs grouped by tag \"#{@options[:group_by]}\""
-        t.title += " (#{@options[:profile]})" if @options[:profile]
-        t.headings = headings
-      end
-      table.rows = group_rows
-      (1..table.columns.size).each { |column| table.align_column(column, :right) }
       table
     end
 
