@@ -3,9 +3,9 @@
 module Cloudcost
   # ServerList represents a list of servers and integrates several output methods
   class ServerList
-    include Cloudcost::TabularOutput
+    include Cloudcost::ServerTabularOutput
+    include Cloudcost::ServerInfluxdbOutput
     include Cloudcost::CsvOutput
-    include Cloudcost::InfluxdbOutput
 
     def initialize(servers, options = {})
       @servers = servers

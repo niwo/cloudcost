@@ -7,9 +7,6 @@ PRICING = YAML.load_file(File.join(
                          ))
 
 module Cloudcost
-  class PricingError < StandardError
-  end
-
   # pricing class which implements cost calculation methods for cloudscale.ch resources
   module Pricing
     def self.server_costs_per_day(flavor)

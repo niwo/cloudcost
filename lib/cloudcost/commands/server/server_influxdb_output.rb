@@ -2,7 +2,7 @@
 
 module Cloudcost
   # InfluxDB output methods for the ServerList class
-  module InfluxdbOutput
+  module ServerInfluxdbOutput
     def grouped_influx_line_protocol(group_rows)
       lines = []
       group_rows.each do |row|

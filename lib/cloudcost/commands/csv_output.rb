@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Cloudcost
-  # CSV output methods for the ServerList class
+  # generic CSV output methods
   module CsvOutput
     def groups_to_csv(group_rows)
       CSV.generate do |csv|

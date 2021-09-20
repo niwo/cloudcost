@@ -3,7 +3,6 @@
 require "parseconfig"
 require "excon"
 require "json"
-require "cloudcost/error"
 
 module Cloudcost
   # Support for cloudscale-cli style API-tokens and profiles
