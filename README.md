@@ -192,3 +192,11 @@ Filter volumes by names:
 ```sh
 cloudcost volumes --name "pvc"
 ```
+
+Output as InfluxDB Line Protocol:
+
+```sh
+cloudcost volumes --output influx --profile prod --no-attached
+```
+
+NOTE: The Line Protocol output includes a tag `state` which is either "attached", "unattached" or "all".
