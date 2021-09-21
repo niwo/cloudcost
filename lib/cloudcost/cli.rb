@@ -96,7 +96,7 @@ module Cloudcost
     option :summary, desc: "display totals only", type: :boolean, aliases: %w[-S]
     option :type, enum: %w[ssd bulk], desc: "volume type"
     option :attached, type: :boolean, desc: "volume attached to servers"
-    option :output, default: "table", enum: %w[table csv], desc: "output format", aliases: %w[-o]
+    option :output, default: "table", enum: %w[table csv influx], desc: "output format", aliases: %w[-o]
     def volumes
       volumes = load_volumes(options)
       if options[:output] == "table"
@@ -154,7 +154,7 @@ module Cloudcost
       end
 
       def output_servers(servers, options)
-        if servers.size < 1
+        if servers.empty?
           yield "WARNING: No servers found."
         elsif options[:group_by]
           yield Cloudcost::ServerList.new(servers, options).grouped_costs
@@ -170,10 +170,12 @@ module Cloudcost
       end
 
       def output_volumes(volumes, options)
-        if volumes.size < 1
+        if volumes.empty?
           yield "WARNING: No volumes found."
         elsif options[:output] == "csv"
           yield Cloudcost::VolumeList.new(volumes, options).to_csv
+        elsif options[:output] == "influx"
+          yield Cloudcost::VolumeList.new(volumes, options).totals_influx_line_protocol
         else
           yield Cloudcost::VolumeList.new(volumes, options).cost_table
         end

@@ -7,7 +7,6 @@ RuboCop::RakeTask.new
 
 task default: %i[rubocop]
 
-
 DOCKER_REGISTRY = "registry.puzzle.ch/puzzle/cloudcost"
 
 desc "Build the docker image and tag it with the current version."
