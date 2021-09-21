@@ -13,7 +13,7 @@ module Cloudcost
       [
         { field: "ssd_gb", key: :size_ssd, unit: "i" },
         { field: "bulk_gb", key: :size_bulk, unit: "i" },
-        { field: "chf_per_day", key: :size, unit: "" }
+        { field: "chf_per_day", key: :cost, unit: "" }
       ].each do |field|
         lines << %(
           cloudscaleVolumeCosts,#{tag_set.join(",")}
