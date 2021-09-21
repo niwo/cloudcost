@@ -5,7 +5,6 @@ require "terminal-table"
 module Cloudcost
   # volumeList represents a list of volumes and integrates several output methods
   class VolumeList
-
     include Cloudcost::CsvOutput
     include Cloudcost::VolumeInfluxdbOutput
 
@@ -18,7 +17,7 @@ module Cloudcost
       total = { size: 0, size_ssd: 0, size_bulk: 0, cost: 0.0 }
       volumes.each do |volume|
         total[:size] += volume.size_gb
-        total["size_#{volume.type}".to_sym] += volume.size_gb if %w(ssd bulk).include? volume.type
+        total["size_#{volume.type}".to_sym] += volume.size_gb if %w[ssd bulk].include? volume.type
         total[:cost] += volume.costs_per_day
       end
       total
@@ -44,7 +43,7 @@ module Cloudcost
 
     def headings
       headings = if @options[:summary]
-                   ["", "SSD [GB]" , "Bulk [GB]", "Total [GB]"]
+                   ["", "SSD [GB]", "Bulk [GB]", "Total [GB]"]
                  else
                    ["Name", "UUID", "Type", "Servers", "Tags", "Size [GB]"]
                  end
@@ -82,6 +81,5 @@ module Cloudcost
       (first_number_row..table.columns.size).each { |column| table.align_column(column, :right) }
       table
     end
-
   end
 end

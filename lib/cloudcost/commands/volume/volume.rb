@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Cloudcost
-
   # Representation of cloudscale.ch volume object
   class Volume
     attr_accessor :data
@@ -27,11 +26,11 @@ module Cloudcost
     end
 
     def server_name
-      servers.size > 0 ? servers.first[:name] : ""
+      servers.size.positive? ? servers.first[:name] : ""
     end
 
     def attached?
-      servers.size > 0 ? true : false
+      servers.size.positive?
     end
 
     def server_uuids
@@ -53,6 +52,5 @@ module Cloudcost
     def costs_per_day
       Pricing.storage_costs_per_day(type, size_gb)
     end
-
   end
 end

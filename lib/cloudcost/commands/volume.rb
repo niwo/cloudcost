@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 require_relative "csv_output"
 require_relative "volume/volume"

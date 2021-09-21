@@ -44,7 +44,11 @@ module Cloudcost
       volumes = volumes.reject { |volume| volume[:tags].key?(options[:missing_tag].to_sym) } if options[:missing_tag]
       volumes = volumes.select { |volume| /#{options[:name]}/.match? volume[:name] } if options[:name]
       volumes = volumes.select { |volume| /#{options[:type]}/.match? volume[:type] } if options[:type]
-      volumes = volumes.select { |volume| (volume[:servers].size > 0) == options[:attached] } if options[:attached] != nil
+      unless options[:attached].nil?
+        volumes = volumes.select do |volume|
+          (volume[:servers].size.positive?) == options[:attached]
+        end
+      end
       volumes
     end
 

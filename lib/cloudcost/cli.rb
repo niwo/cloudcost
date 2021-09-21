@@ -154,7 +154,7 @@ module Cloudcost
       end
 
       def output_servers(servers, options)
-        if servers.size < 1
+        if servers.empty?
           yield "WARNING: No servers found."
         elsif options[:group_by]
           yield Cloudcost::ServerList.new(servers, options).grouped_costs
@@ -170,7 +170,7 @@ module Cloudcost
       end
 
       def output_volumes(volumes, options)
-        if volumes.size < 1
+        if volumes.empty?
           yield "WARNING: No volumes found."
         elsif options[:output] == "csv"
           yield Cloudcost::VolumeList.new(volumes, options).to_csv
